@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dashboard — Rutas Botadas Same Day</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #F7F6F3; color: #1a1a1a; padding: 24px; }
+  h1 { font-size: 22px; font-weight: 700; margin-bottom: 4px; color: #111; }
+  .subtitle { font-size: 13px; color: #787774; margin-bottom: 24px; }
+  .kpi-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-bottom: 24px; }
+  .kpi { background: #fff; border-radius: 10px; padding: 16px 18px; border: 1px solid #e8e8e6; }
+  .kpi-label { font-size: 11px; color: #787774; text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 6px; }
+  .kpi-value { font-size: 28px; font-weight: 700; color: #111; }
+  .kpi-sub { font-size: 11px; color: #9b9b99; margin-top: 3px; }
+  .charts-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 24px; }
+  .chart-card { background: #fff; border-radius: 10px; padding: 18px; border: 1px solid #e8e8e6; }
+  .chart-title { font-size: 12px; font-weight: 600; color: #787774; text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 14px; }
+  .chart-wide { background: #fff; border-radius: 10px; padding: 18px; border: 1px solid #e8e8e6; margin-bottom: 24px; }
+  .table-card { background: #fff; border-radius: 10px; padding: 18px; border: 1px solid #e8e8e6; }
+  .tabs { display: flex; gap: 6px; margin-bottom: 14px; }
+  .tab { font-size: 12px; padding: 4px 12px; border-radius: 6px; border: 1px solid #e0e0de; background: transparent; cursor: pointer; color: #787774; font-family: inherit; }
+  .tab.active { background: #2E5A9E; color: #fff; border-color: #2E5A9E; }
+  table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  th { text-align: left; font-size: 11px; font-weight: 600; color: #787774; text-transform: uppercase; letter-spacing: 0.05em; padding: 6px 10px; border-bottom: 1px solid #e8e8e6; }
+  td { padding: 8px 10px; border-bottom: 1px solid #f0f0ee; color: #1a1a1a; vertical-align: middle; }
+  tr:last-child td { border-bottom: none; }
+  .badge { display: inline-block; font-size: 11px; padding: 2px 8px; border-radius: 5px; font-weight: 500; }
+  .s1 { background: #dbeafe; color: #1d4ed8; }
+  .s2 { background: #dcfce7; color: #15803d; }
+  .s3 { background: #fef3c7; color: #b45309; }
+  .bar-wrap { display: flex; align-items: center; gap: 7px; }
+  .bar-bg { flex: 1; height: 7px; background: #f0f0ee; border-radius: 4px; overflow: hidden; min-width: 60px; }
+  .bar-fill { height: 100%; border-radius: 4px; }
+  .num { font-weight: 600; font-size: 13px; min-width: 22px; text-align: right; }
+  .legend { display: flex; flex-wrap: wrap; gap: 12px; font-size: 11px; color: #787774; margin-bottom: 10px; }
+  .leg-dot { width: 10px; height: 10px; border-radius: 2px; display: inline-block; margin-right: 4px; vertical-align: middle; }
+  @media (max-width: 680px) {
+    .kpi-grid { grid-template-columns: repeat(2, 1fr); }
+    .charts-grid { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<h1>🚨 Rutas Botadas — Same Day</h1>
+<p class="subtitle">Análisis semanal de rutas no realizadas · Pedidos sin despacho · Semanas 1, 2 y 3</p>
+
+<div class="kpi-grid">
+  <div class="kpi">
+    <div class="kpi-label">Rutas botadas</div>
+    <div class="kpi-value">49</div>
+    <div class="kpi-sub">Total 3 semanas</div>
+  </div>
+  <div class="kpi">
+    <div class="kpi-label">Pedidos perdidos</div>
+    <div class="kpi-value">960</div>
+    <div class="kpi-sub">Total acumulado</div>
+  </div>
+  <div class="kpi">
+    <div class="kpi-label">Zonas afectadas</div>
+    <div class="kpi-value">38</div>
+    <div class="kpi-sub">Zonas únicas</div>
+  </div>
+  <div class="kpi">
+    <div class="kpi-label">Promedio / ruta</div>
+    <div class="kpi-value">19.6</div>
+    <div class="kpi-sub">Pedidos perdidos</div>
+  </div>
+</div>
+
+<div class="charts-grid">
+  <div class="chart-card">
+    <div class="chart-title">Pedidos perdidos por semana</div>
+    <div class="legend">
+      <span><span class="leg-dot" style="background:#2E5A9E;"></span>Semana 1</span>
+      <span><span class="leg-dot" style="background:#16A34A;"></span>Semana 2</span>
+      <span><span class="leg-dot" style="background:#D97706;"></span>Semana 3</span>
+    </div>
+    <div style="position:relative; height:200px;">
+      <canvas id="weekChart" role="img" aria-label="Pedidos perdidos: S1 426, S2 255, S3 279">S1:426 S2:255 S3:279</canvas>
+    </div>
+  </div>
+  <div class="chart-card">
+    <div class="chart-title">Rutas botadas por semana</div>
+    <div class="legend">
+      <span><span class="leg-dot" style="background:#9333EA;"></span>N° rutas</span>
+    </div>
+    <div style="position:relative; height:200px;">
+      <canvas id="routeChart" role="img" aria-label="Rutas botadas: S1 20, S2 15, S3 14">S1:20 S2:15 S3:14</canvas>
+    </div>
+  </div>
+</div>
+
+<div class="chart-wide">
+  <div class="chart-title">Top zonas — pedidos perdidos acumulados</div>
+  <div class="legend">
+    <span><span class="leg-dot" style="background:#DC2626;"></span>Crítico (≥50)</span>
+    <span><span class="leg-dot" style="background:#D97706;"></span>Alto (30–49)</span>
+    <span><span class="leg-dot" style="background:#2E5A9E;"></span>Medio (&lt;30)</span>
+  </div>
+  <div style="position:relative; height:340px;">
+    <canvas id="zoneChart" role="img" aria-label="Top zonas por pedidos perdidos">La Florida/La Granja:76, El Bosque/S.Miguel grupo:53, La Serena:53, San Bernardo:59, Colina:51</canvas>
+  </div>
+</div>
+
+<div class="table-card">
+  <div class="chart-title" style="margin-bottom:12px;">Detalle de rutas botadas</div>
+  <div class="tabs">
+    <button class="tab active" onclick="setFilter('all',this)">Todas (49)</button>
+    <button class="tab" onclick="setFilter('s1',this)">Semana 1 (20)</button>
+    <button class="tab" onclick="setFilter('s2',this)">Semana 2 (15)</button>
+    <button class="tab" onclick="setFilter('s3',this)">Semana 3 (14)</button>
+  </div>
+  <div style="overflow-x:auto;">
+    <table>
+      <thead>
+        <tr>
+          <th>Semana</th>
+          <th>ID Ruta</th>
+          <th>Zona(s)</th>
+          <th>Pedidos</th>
+          <th style="min-width:120px;">Impacto</th>
+        </tr>
+      </thead>
+      <tbody id="tbody"></tbody>
+    </table>
+  </div>
+</div>
+
+<script>
+const data = [
+  {s:'s1',id:146947,z:'Cerrillos, Maipú',p:24},
+  {s:'s1',id:146990,z:'Antofagasta',p:19},
+  {s:'s1',id:147005,z:'San Pedro de La Paz',p:2},
+  {s:'s1',id:147061,z:'Cerrillos, Maipú',p:21},
+  {s:'s1',id:147467,z:'Cerro Navia, Renca',p:50},
+  {s:'s1',id:147576,z:'Santiago, Santiago Centro',p:22},
+  {s:'s1',id:147875,z:'La Florida, La Granja',p:29},
+  {s:'s1',id:147876,z:'Macul, Ñuñoa',p:31},
+  {s:'s1',id:147926,z:'Santiago, Santiago Centro',p:16},
+  {s:'s1',id:147935,z:'Las Condes, Vitacura',p:33},
+  {s:'s1',id:147945,z:'Colina',p:20},
+  {s:'s1',id:147950,z:'Lo Barnechea',p:12},
+  {s:'s1',id:147961,z:'Antofagasta',p:9},
+  {s:'s1',id:147968,z:'Curicó',p:5},
+  {s:'s1',id:148471,z:'Colina',p:31},
+  {s:'s1',id:148472,z:'El Bosque, La Cisterna, Lo Espejo, San Joaquín, San Miguel, San Ramón',p:23},
+  {s:'s1',id:148501,z:'La Pintana, Puente Alto',p:27},
+  {s:'s1',id:148544,z:'Quintero',p:3},
+  {s:'s1',id:148546,z:'Huechuraba, Independencia, Recoleta',p:27},
+  {s:'s1',id:148547,z:'Lo Prado, Pudahuel',p:22},
+  {s:'s2',id:149188,z:'Coquimbo',p:11},
+  {s:'s2',id:149629,z:'Santiago, Santiago Centro',p:30},
+  {s:'s2',id:149636,z:'Cerro Navia, Lo Prado, Pudahuel, Renca',p:33},
+  {s:'s2',id:149706,z:'La Serena',p:15},
+  {s:'s2',id:150121,z:'El Monte, Melipilla, Peñaflor',p:9},
+  {s:'s2',id:150131,z:'Las Condes, Vitacura',p:33},
+  {s:'s2',id:150143,z:'(sin datos de zona)',p:4},
+  {s:'s2',id:150146,z:'Providencia',p:22},
+  {s:'s2',id:150158,z:'Puerto Montt',p:3},
+  {s:'s2',id:150187,z:'La Serena',p:20},
+  {s:'s2',id:150599,z:'Machalí, Rancagua',p:12},
+  {s:'s2',id:150602,z:'San Bernardo',p:27},
+  {s:'s2',id:150616,z:'San Antonio',p:2},
+  {s:'s2',id:150622,z:'Valparaíso',p:5},
+  {s:'s2',id:150636,z:'Valparaíso',p:29},
+  {s:'s3',id:151688,z:'Estación Central, Quinta Normal',p:22},
+  {s:'s3',id:151738,z:'Río Bueno',p:2},
+  {s:'s3',id:152263,z:'La Florida, La Granja',p:65},
+  {s:'s3',id:152298,z:'Quillota',p:2},
+  {s:'s3',id:152300,z:'San Fernando',p:3},
+  {s:'s3',id:152866,z:'Isla de Maipo, Melipilla, Talagante',p:12},
+  {s:'s3',id:152922,z:'Los Andes',p:2},
+  {s:'s3',id:152940,z:'La Serena',p:18},
+  {s:'s3',id:153440,z:'El Bosque, La Cisterna, Lo Espejo, Pedro Aguirre Cerda, San Joaquín, San Miguel',p:30},
+  {s:'s3',id:153469,z:'San Pedro de La Paz',p:5},
+  {s:'s3',id:153654,z:'La Reina, Peñalolén',p:20},
+  {s:'s3',id:153935,z:'El Bosque, La Cisterna, Lo Espejo, Pedro Aguirre Cerda, San Joaquín, San Miguel, San Ramón',p:54},
+  {s:'s3',id:153949,z:'San Bernardo',p:32},
+  {s:'s3',id:153960,z:'Quillota',p:2},
+  {s:'s3',id:153991,z:'Lampa',p:10},
+];
+
+const maxP = 65;
+const labels = {s1:'Semana 1',s2:'Semana 2',s3:'Semana 3'};
+
+function color(p) { return p>=50?'#DC2626':p>=30?'#D97706':'#2E5A9E'; }
+
+function render(filter) {
+  const rows = filter==='all'?data:data.filter(r=>r.s===filter);
+  document.getElementById('tbody').innerHTML = rows.map(r=>`
+    <tr>
+      <td><span class="badge ${r.s}">${labels[r.s]}</span></td>
+      <td style="font-family:monospace;font-size:12px;color:#787774;">${r.id}</td>
+      <td style="max-width:220px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;" title="${r.z}">${r.z}</td>
+      <td style="font-weight:600;">${r.p}</td>
+      <td>
+        <div class="bar-wrap">
+          <div class="bar-bg"><div class="bar-fill" style="width:${Math.round(r.p/maxP*100)}%;background:${color(r.p)};"></div></div>
+          <span class="num" style="color:${color(r.p)};">${r.p}</span>
+        </div>
+      </td>
+    </tr>`).join('');
+}
+
+function setFilter(f, el) {
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+  el.classList.add('active');
+  render(f);
+}
+
+render('all');
+
+new Chart(document.getElementById('weekChart'),{
+  type:'bar',
+  data:{labels:['Semana 1','Semana 2','Semana 3'],datasets:[{
+    data:[426,255,279],
+    backgroundColor:['#2E5A9E','#16A34A','#D97706'],
+    borderRadius:5
+  }]},
+  options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},
+    scales:{y:{beginAtZero:true,grid:{color:'rgba(0,0,0,0.05)'},ticks:{font:{size:11}}},
+            x:{grid:{display:false},ticks:{font:{size:11}}}}}
+});
+
+new Chart(document.getElementById('routeChart'),{
+  type:'bar',
+  data:{labels:['Semana 1','Semana 2','Semana 3'],datasets:[{
+    data:[20,15,14],
+    backgroundColor:['#9333EA','#9333EA','#9333EA'],
+    borderRadius:5
+  }]},
+  options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},
+    scales:{y:{beginAtZero:true,grid:{color:'rgba(0,0,0,0.05)'},ticks:{font:{size:11}}},
+            x:{grid:{display:false},ticks:{font:{size:11}}}}}
+});
+
+new Chart(document.getElementById('zoneChart'),{
+  type:'bar',
+  data:{
+    labels:['La Florida/La Granja','San Bernardo','El Bosque/S.Miguel (grupo)','La Serena','Colina','Cerro Navia/Renca','Santiago/Stgo Centro','Valparaíso','Las Condes/Vitacura','Macul/Ñuñoa'],
+    datasets:[{
+      data:[76,59,53,53,51,42,34,34,33,31],
+      backgroundColor:['#DC2626','#DC2626','#DC2626','#DC2626','#DC2626','#D97706','#D97706','#D97706','#D97706','#2E5A9E'],
+      borderRadius:4
+    }]
+  },
+  options:{
+    indexAxis:'y',responsive:true,maintainAspectRatio:false,
+    plugins:{legend:{display:false}},
+    scales:{
+      x:{beginAtZero:true,grid:{color:'rgba(0,0,0,0.05)'},ticks:{font:{size:11}}},
+      y:{grid:{display:false},ticks:{font:{size:11}}}
+    }
+  }
+});
+</script>
+</body>
+</html>
